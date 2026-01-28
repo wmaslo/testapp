@@ -24,12 +24,14 @@ def verbindung():
     conn = sqlite3.connect(DB_DATEI)
     # Öffnet datenbank.db (oder erstellt sie, wenn sie nicht existiert)
 
-    conn.execute("PRAGMA foreign_keys = ON;")
+    conn.text_factory = str
     # Für dumme:
-    # SQLite ignoriert Foreign Keys oft standardmäßig.
-    # Mit diesem Befehl stellen wir sicher, dass Regeln wie
-    # "question.category_id muss in categories.id existieren" wirklich gelten.
+    # sqlite3 soll Text immer als Python-String (str) behandeln.
+
+    conn.execute("PRAGMA foreign_keys = ON;")
+    # Foreign Keys aktivieren (wichtig!)
 
     return conn
+
     # Wir geben die Verbindung zurück, damit andere Dateien damit arbeiten können.
 

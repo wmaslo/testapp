@@ -5,8 +5,26 @@
 import os           # Für EDITOR-Variable (z.B. nvim)
 import subprocess   # Um nvim zu starten
 import tempfile     # Für eine temporäre Datei zum Editieren
+import sys          # für stdout encoding (optional)
 
 from datenbank import verbindung
+
+def _sauberer_text(s):
+    """
+    Macht einen String "SQLite-sicher" in UTF-8.
+
+    Für dumme:
+    - Manchmal kommt bei input() ein kaputtes Zeichen rein (z.B. durch Copy/Paste).
+    - Dieses kaputte Zeichen kann Python nicht als UTF-8 speichern -> Crash.
+    - Wir ersetzen dann unrettbare Zeichen durch �, damit das Programm nicht abstürzt.
+    """
+    if s is None:
+        return ""
+    if not isinstance(s, str):
+        s = str(s)
+
+    # Encode/Decode Roundtrip: alles was nicht geht, wird ersetzt
+    return s.encode("utf-8", errors="replace").decode("utf-8", errors="replace")
 
 
 def fragen_von_kategorie(category_id):
@@ -55,6 +73,7 @@ def frage_anlegen(question_text, solution, category_id):
 
     question_text = question_text.strip()
     solution = (solution or "").strip()
+
 
     if question_text == "":
         return None
